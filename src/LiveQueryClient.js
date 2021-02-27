@@ -8,7 +8,7 @@
  *
  */
 /* global WebSocket */
-
+// first
 import CoreManager from './CoreManager';
 import EventEmitter from './EventEmitter';
 import ParseObject from './ParseObject';
@@ -31,6 +31,7 @@ const OP_TYPES = {
   SUBSCRIBE: 'subscribe',
   UNSUBSCRIBE: 'unsubscribe',
   ERROR: 'error',
+  AGORA: 'agora',
 };
 
 // The event we get back from LiveQuery server
@@ -201,7 +202,7 @@ class LiveQueryClient extends EventEmitter {
     const where = queryJSON.where;
     const fields = queryJSON.keys ? queryJSON.keys.split(',') : undefined;
     const subscribeRequest = {
-      op: OP_TYPES.SUBSCRIBE,
+      op: OP_TYPES.SUBSCRIBE, //
       requestId: this.requestId,
       query: {
         className,
@@ -222,6 +223,35 @@ class LiveQueryClient extends EventEmitter {
     });
 
     return subscription;
+  }
+
+  /**
+   * Send agora logs to a ParseQuery
+   *
+   * @param {object} query - the ParseQuery you want to subscribe to
+   * @param {string} sessionToken (optional)
+   * @returns {boolean} subscription
+   */
+  sendLogs(query: Object, sessionToken: ?string) {
+    if (!query) {
+      return;
+    }
+    const sendLogsRequest = {
+      op: OP_TYPES.AGORA, //
+      requestId: this.requestId,
+      strength: query.strength,
+      quality: query.quality,
+      userId: query.userId,
+      sessionId: query.sessionId,
+    };
+
+    if (sessionToken) {
+      sendLogsRequest.sessionToken = sessionToken;
+    }
+
+    this.connectPromise.then(() => {
+      this.socket.send(JSON.stringify(sendLogsRequest));
+    });
   }
 
   /**

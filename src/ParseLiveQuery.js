@@ -55,6 +55,11 @@ LiveQuery.open = async () => {
   liveQueryClient.open();
 };
 
+LiveQuery.sendLogs = async () => {
+  const liveQueryClient = await getLiveQueryClient();
+  liveQueryClient.sendLogs();
+};
+
 /**
  * When you're done using LiveQuery, you can call Parse.LiveQuery.close().
  * This function will close the WebSocket connection to the LiveQuery server,
